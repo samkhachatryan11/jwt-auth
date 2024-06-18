@@ -34,7 +34,6 @@ export async function createUserRequest(req, res, next) {
         await Schema.validateAsync(req.body, {abortEarly: false});
         next();
     } catch (error) {
-        console.log(error);
         return res.status(400).json(error.message)
     }
 };
@@ -66,7 +65,6 @@ export async function loginRequest(req, res, next) {
         await Schema.validateAsync(req.body, {abortEarly: false});
         next();
     } catch (error) {
-        console.log(error);
         return res.status(400).json(error.message)
     }
 };

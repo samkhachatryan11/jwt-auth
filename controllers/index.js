@@ -44,6 +44,10 @@ export async function login(req, res) {
     const { email } = req.body;
     const user = await User.findOne({ email });
 
+    if(!bcrypt.compareSync(req.body.password, user.password)) {
+        return res.status(401).json({message: 'Wrong password!'})
+    }
+
     const accessToken = jwt.sign({id: user._id, username: user.username, email: user.email}, process.env.JWT_ACCESS_SECRET, { expiresIn: '1h' });
     const refreshToken = jwt.sign({id: user._id, username: user.username, email: user.email}, process.env.JWT_REFRESH_SECRET, {expiresIn: '30d'});
         
@@ -64,7 +68,6 @@ export async function login(req, res) {
 };
 
 export async function deleteUser(req, res) {
-    console.log('req.user', req.user);
     const deleteUser = await User.findOneAndDelete({ _id: req.user.id });
 
     if(!deleteUser) {
@@ -85,7 +88,6 @@ export async function logout(req, res) {
 export async function tokenRefresh(req, res) {
     const user = jwt.verify(req.body.refreshToken, process.env.JWT_REFRESH_SECRET)
     const token = await client.get(`token_${user.id}`)
-    console.log('token', token);
     if(!user || req.body.refreshToken !== token) {
         res.status(401).send('Unauthorized')
     }
